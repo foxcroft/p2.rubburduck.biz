@@ -10,15 +10,90 @@ class users_controller extends base_controller {
     }
 
     public function signup() {
-        echo "This is the signup page";
+        echo "This is the signup page anew";
+
+        # Set up the view
+        $this->template->content = View::instance('v_users_signup');
+    
+        # Render the view
+        echo $this->template;
+
+
+    }
+
+    public function p_signup() {
+
+        $_POST['created']  = Time::now();
+        $_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
+        $_POST['token']    = sha1(TOKEN_SALT.$POST['email'].Utils::generate_random_string());
+
+        echo "<pre>";
+        print_r($_POST);
+        echo "</pre>";
+
+        DB::instance(DB_NAME)->insert_row('users', $_POST);
+
+        Router::redirect('/users/login');
+
     }
 
     public function login() {
         echo "This is the login page";
+
+        # Set up the view
+        $this->template->content = View::instance('v_users_login');
+    
+        # Render the view
+        echo $this->template;
+    }
+
+    public function p_login() {
+
+        $_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
+
+
+        #commented out, because echoing is interfering with setcookie
+        // echo "<pre>";
+        // print_r($_POST);
+        // echo "</pre>";
+
+
+        $qry1 = 'SELECT token
+                FROM users
+                WHERE email = "'.$_POST['email'].'"
+                AND password = "'.$_POST['password'].'"';
+
+        // echo $qry1;
+
+        $token = DB::instance(DB_NAME)->select_field($qry1);
+
+        # commented out, because echoing is interfering with setcookie    
+        // echo 'token = '.$token;
+        // echo '<br>';
+
+        #success
+        if($token) {
+            setcookie('token',$token,strtotime('+1 year'),'/');
+            echo "Welcome inside this secret portal!";
+        }
+        #failure
+        else {
+            echo "You are a failure. Stay out.";
+        }
     }
 
     public function logout() {
-        echo "This is the logout page";
+
+        $new_token = sha1(TOKEN_SALT.$this->user->email.Utils::generate_random_string());
+
+        $data = Array('token' => $new_token);
+
+        DB::instance(DB_NAME)->update('users', $data, 'WHERE user_id ='. $this->user->user_id);
+
+        setcookie('token', '', strtotime('-1 year'), '/');
+
+        Router::redirect('/');
+
     }
 
     public function profile($user_name = NULL) {
@@ -33,19 +108,43 @@ class users_controller extends base_controller {
         // # Render View
         // echo $view;
         
-
         
+        # verify the user
+        if (!$this->user) {
+        
+            // Router::redirect('/');
+
+            die('Not getting in that way! <br> <a href="/users/login">Log in</a>');
+
+        }
+
         # Set up the View
         $this->template->content = View::instance('v_users_profile');
+        
+        # Pass the data to the View
+        $this->template->content->user_name = $user_name;
 
+        # Set the title
         $this->template->title = "Profile";
 
-        $this->template->content->user_name = $user_name;
+        # Set Client files Head
+        $client_files_head = Array(
+            '/css/profile.css', 
+            '/css/master.css'
+            ); # end of array
+
+        $this->template->client_files_head = Utils::load_client_files($client_files_head);
+
+        # Set Client files Body
+        $client_files_body = Array(
+            '/js/profile.js'
+            ); # end of array
+
+        $this->template->client_files_body = Utils::load_client_files($client_files_body);
 
         # Display the View
         echo $this->template;
         
-
     }
 
 } # end of the class
