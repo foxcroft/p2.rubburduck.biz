@@ -1,4 +1,7 @@
-<h2>Log In</h2>
+<head>
+	<link rel="stylesheet" type="text/css" href="/css/default.css">
+</head>
+<h1>Log In</h1>
 
 <form method='POST' action='/users/p_login'>
 

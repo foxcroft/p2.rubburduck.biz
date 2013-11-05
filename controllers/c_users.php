@@ -6,11 +6,9 @@ class users_controller extends base_controller {
     } 
 
     public function index() {
-        echo "This is the index page";
     }
 
     public function signup() {
-        echo "This is the signup page anew";
 
         # Set up the view
         $this->template->content = View::instance('v_users_signup');
@@ -38,7 +36,6 @@ class users_controller extends base_controller {
     }
 
     public function login() {
-        echo "This is the login page";
 
         # Set up the view
         $this->template->content = View::instance('v_users_login');
@@ -74,12 +71,20 @@ class users_controller extends base_controller {
         #success
         if($token) {
             setcookie('token',$token,strtotime('+1 year'),'/');
-            echo "Welcome inside this secret portal!";
         }
         #failure
         else {
             echo "You are a failure. Stay out.";
         }
+
+        $qry = 'SELECT first_name
+                FROM users
+                WHERE email = "'.$_POST['email'].'"
+                AND password = "'.$_POST['password'].'"';
+
+        $first_name = DB::instance(DB_NAME)->select_field($qry);
+
+        Router::redirect('/users/profile/'.$first_name);
     }
 
     public function logout() {
@@ -125,7 +130,7 @@ class users_controller extends base_controller {
         $this->template->content->user_name = $user_name;
 
         # Set the title
-        $this->template->title = "Profile";
+        $this->template->title = $user_name."'s Profile";
 
         # Set Client files Head
         $client_files_head = Array(
@@ -141,6 +146,26 @@ class users_controller extends base_controller {
             ); # end of array
 
         $this->template->client_files_body = Utils::load_client_files($client_files_body);
+
+
+        $q = 'SELECT 
+                posts.content,
+                posts.created,
+                posts.user_id AS post_user_id,
+                users_users.user_id AS follower_id,
+                users.first_name,
+                users.last_name
+            FROM posts
+            INNER JOIN users_users
+                ON posts.user_id = users_users.user_id_followed
+            INNER JOIN users
+                ON posts.user_id = users.user_id
+            WHERE users_users.user_id = '.$this->user->user_id;
+
+        $posts = DB::instance(DB_NAME)->select_rows($q);
+
+        $this->template->content->posts = $posts;
+        
 
         # Display the View
         echo $this->template;
