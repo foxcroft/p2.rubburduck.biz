@@ -18,7 +18,10 @@ class posts_controller extends base_controller {
 
 		DB::instance(DB_NAME)->insert('posts', $_POST);
 
-		print_r($_POST);
+		# check the post added to the database
+		// print_r($_POST);
+
+		Router::redirect("/users/profile");
 
 	}
 

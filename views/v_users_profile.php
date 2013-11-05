@@ -6,20 +6,28 @@
 <?php if(isset($user_name)): ?>
 
     <h1>Yello, <?=$user_name?>!</h1>
-    <h2>What have you been saying lately?</h2>
     <h2><a href="/posts">Yello out there?</a> |
-    	<a href="/posts/add">Yello some more</a></h2>
+    	<a href="/posts/add">Yello something</a> |
+    	<a href="/posts/users">Follo</a> | 
+    	<a href="/users/logout">Logoff</a></h2>
+    <br>
+    <h2>What have you been saying lately?</h2>
 
 <?php else: ?>
     <h1>No user has been specified</h1>
 <?php endif; ?>
 
 <!-- list out my posts -->
-<?php foreach($posts as $post): ?>
+<p>
+	<?php foreach($posts as $post): ?>
 
-	<strong><?=$post['first_name']?></strong>
-	<?=$post['last_name']?><br>
+		<span id="poster_name"><strong><?=$post['first_name']?></strong>
+		<?=$post['last_name']?></span><br>
 
-	<?=$post['content']?><br><br>
+		<?=$post['content']?><br>
+		<?php $post_time = Time::display($post['created']);?>
+		<span id="post_time"><?php echo $post_time;?></span>
+		<br><br>
 
-<?php endforeach; ?>
+	<?php endforeach; ?>
+</p>

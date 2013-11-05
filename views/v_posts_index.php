@@ -5,6 +5,8 @@
 <body>
 
 	<h1>The Yello Reel</h1>
+	<h2><a href="/users/profile">My Yello</a> |
+    	<a href="/posts/add">Yello something</a> | <a href="/users/logout">Logoff</a></h2>
 
 	<?php foreach($posts as $post): ?>
 

@@ -25,9 +25,10 @@ class users_controller extends base_controller {
         $_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
         $_POST['token']    = sha1(TOKEN_SALT.$POST['email'].Utils::generate_random_string());
 
-        echo "<pre>";
-        print_r($_POST);
-        echo "</pre>";
+        # to test Array printout
+        // echo "<pre>";
+        // print_r($_POST);
+        // echo "</pre>";
 
         DB::instance(DB_NAME)->insert_row('users', $_POST);
 
@@ -55,14 +56,14 @@ class users_controller extends base_controller {
         // echo "</pre>";
 
 
-        $qry1 = 'SELECT token
+        $qry = 'SELECT token
                 FROM users
                 WHERE email = "'.$_POST['email'].'"
                 AND password = "'.$_POST['password'].'"';
 
         // echo $qry1;
 
-        $token = DB::instance(DB_NAME)->select_field($qry1);
+        $token = DB::instance(DB_NAME)->select_field($qry);
 
         # commented out, because echoing is interfering with setcookie    
         // echo 'token = '.$token;
@@ -74,7 +75,8 @@ class users_controller extends base_controller {
         }
         #failure
         else {
-            echo "You are a failure. Stay out.";
+            echo "You are a failure. Stay out.<br><br>
+                or <a href='/users/login'>try again!</a>";
         }
 
         $qry = 'SELECT first_name
@@ -123,6 +125,22 @@ class users_controller extends base_controller {
 
         }
 
+
+        if (!$user_name) {
+            $q = 'SELECT first_name
+                    FROM users
+                    WHERE users.user_id = '.$this->user->user_id;
+
+            $name = DB::instance(DB_NAME)->select_field($q);
+
+            # to reroute to profile of user
+            Router::redirect('/users/profile/'.$name);
+
+            # if the page dies instead of rerouting
+            // die('Not getting in that way! <br> <a href="/users/profile/'.$name.'">Log in</a>');
+        }
+
+
         # Set up the View
         $this->template->content = View::instance('v_users_profile');
         
@@ -165,6 +183,9 @@ class users_controller extends base_controller {
         $posts = DB::instance(DB_NAME)->select_rows($q);
 
         $this->template->content->posts = $posts;
+
+        # for converting time to readable format, could be wrong
+        $this->template->content->post_time = Time::display($posts['user_id']);
         
 
         # Display the View
