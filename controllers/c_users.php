@@ -6,6 +6,7 @@ class users_controller extends base_controller {
     } 
 
     public function index() {
+        Router::redirect('/users/profile');
     }
 
     public function signup() {
@@ -119,9 +120,10 @@ class users_controller extends base_controller {
         # verify the user
         if (!$this->user) {
         
-            // Router::redirect('/');
+            # trying to sneak in without being logged in, route to homepage
+            Router::redirect('/');
 
-            die('Not getting in that way! <br> <a href="/users/login">Log in</a>');
+            // die('Not getting in that way! <br> <a href="/users/login">Log in</a>');
 
         }
 
@@ -169,23 +171,20 @@ class users_controller extends base_controller {
         $q = 'SELECT 
                 posts.content,
                 posts.created,
-                posts.user_id AS post_user_id,
-                users_users.user_id AS follower_id,
+                posts.user_id,
                 users.first_name,
                 users.last_name
             FROM posts
-            INNER JOIN users_users
-                ON posts.user_id = users_users.user_id_followed
             INNER JOIN users
                 ON posts.user_id = users.user_id
-            WHERE users_users.user_id = '.$this->user->user_id;
+            WHERE posts.user_id = '.$this->user->user_id;
 
         $posts = DB::instance(DB_NAME)->select_rows($q);
 
         $this->template->content->posts = $posts;
 
         # for converting time to readable format, could be wrong
-        $this->template->content->post_time = Time::display($posts['user_id']);
+        // $this->template->content->post_time = Time::display($posts['created']);
         
 
         # Display the View

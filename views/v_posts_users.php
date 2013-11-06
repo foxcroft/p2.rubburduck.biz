@@ -14,16 +14,16 @@
 
 	<?php foreach($users as $user): ?>
 
-		<span id="poster_name"><h2 class="follow">
+		<h2 class="follow">
 			<?=$user['first_name']?>
-			<?=$user['last_name']?></span><br>
+			<?=$user['last_name']?><br>
 		</h2>
 
 		<p class="follow">
 			<?php if (isset($connections[$user['user_id']])): ?>
-				<a href='/posts/unfollow/<?=$user['user_id']?>'>FOLLO</a>
+				<a href='/posts/unfollow/<?=$user['user_id']?>'>UNFOLLO</a>
 			<?php else: ?>
-				<a href='/posts/follow/<?=$user['user_id']?>'>UNFOLLO</a>
+				<a href='/posts/follow/<?=$user['user_id']?>'>FOLLO</a>
 			<?php endif; ?>
 		</p>
 		<br>
