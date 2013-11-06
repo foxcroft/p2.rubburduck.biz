@@ -9,11 +9,16 @@ class users_controller extends base_controller {
         Router::redirect('/users/profile');
     }
 
-    public function signup() {
+    public function signup($error = NULL) {
+
 
         # Set up the view
         $this->template->content = View::instance('v_users_signup');
     
+        if($error) {
+            $this->template->error_msg = "All fields are required";
+        }
+
         # Render the view
         echo $this->template;
 
@@ -21,6 +26,34 @@ class users_controller extends base_controller {
     }
 
     public function p_signup() {
+
+        if(!$_POST['first_name'])
+        {
+            Router::redirect('/users/signup/error');
+        }
+        if (!$_POST['last_name']) {
+            Router::redirect('/users/signup/error');
+        }
+        if (!$_POST['email']) {
+            Router::redirect('/users/signup/error');
+        }
+        if (!$_POST['password']) {
+            Router::redirect('/users/signup/error');
+        }
+
+        # test to see if email is already in use
+        $q = 'SELECT *
+                FROM users';
+        $users = DB::instance(DB_NAME)->select_rows($q);
+        foreach ($users as $user) {
+            if ($user['email'] == $_POST['email']) {
+                die("<br>That email address is already in use.<br><br>
+                    Why not try a different one! <a href='/users/signup' style='text-decoration: none;'>Register</a>");
+            }
+
+        }
+
+
 
         $_POST['created']  = Time::now();
         $_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
@@ -37,16 +70,29 @@ class users_controller extends base_controller {
 
     }
 
-    public function login() {
+    public function login($error = NULL) {
 
         # Set up the view
         $this->template->content = View::instance('v_users_login');
+
+        if($error) {
+            $this->template->error_msg = "All fields are required";
+        }
     
         # Render the view
         echo $this->template;
     }
 
     public function p_login() {
+
+        if(!$_POST['email'])
+        {
+            Router::redirect('/users/login/error');
+        }
+        elseif (!$_POST['password']) {
+            Router::redirect('/users/login/error');
+        }
+
 
         $_POST['password'] = sha1(PASSWORD_SALT.$_POST['password']);
 
@@ -76,8 +122,8 @@ class users_controller extends base_controller {
         }
         #failure
         else {
-            echo "You are a failure. Stay out.<br><br>
-                or <a href='/users/login'>try again!</a>";
+            echo "<br>You are a failure. Stay out.<br><br>
+                Or why not <a href='/users/login'>try again!</a>";
         }
 
         $qry = 'SELECT first_name
@@ -109,12 +155,6 @@ class users_controller extends base_controller {
         // # Create a new View instance
         // # Do *not* include .php with the view name
         // $view = View::instance('v_users_profile');
-
-        // # Pass information to the view instance
-        // $view->user_name = $user_name;
-
-        // # Render View
-        // echo $view;
         
         
         # verify the user

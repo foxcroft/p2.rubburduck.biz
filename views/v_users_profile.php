@@ -8,8 +8,8 @@
 	<?php if(isset($user_name)): ?>
 
 	    <h1>Yello, <?=$user_name?>!</h1>
-	    <h2><a href="/posts">Yello out there?</a> |
-	    	<a href="/posts/add">Yello something</a> |
+	    <h2><a href="/posts">The Yello Reel</a> |
+	    	<a href="/posts/add">Yello Out</a> |
 	    	<a href="/posts/users">Follo</a> | 
 	    	<a href="/users/logout">Logoff</a></h2>
 	    <br>
@@ -30,7 +30,7 @@
 			<span id="post_time"><?php echo $post_time;?></span><br>
 
 			<?=$post['content']?><br>
-			<a href="/posts/delete/<?=$post['post_id']?>" id="delete">DELETE</a>
+			<a href="/posts/delete/<?=$post['post_id']?>" id="sub_line">DELETE</a>
 
 			<br><br>
 
