@@ -33,6 +33,11 @@ class posts_controller extends base_controller {
 
         }
 
+        #if the enter an empty message, redirect back to add page
+        if ($_POST['content'] == "") {
+        	Router::redirect('/posts/add');
+        }
+
 		$_POST['user_id']  = $this->user->user_id;
 		$_POST['created']  = Time::now();
 		$_POST['modified'] = Time::now();
@@ -77,13 +82,6 @@ class posts_controller extends base_controller {
 				ON posts.user_id = users.user_id
 			WHERE users_users.user_id = '.$this->user->user_id;
 
-		# old query type
-		// $q = 'SELECT posts.*,
-		// 		users.first_name,
-		// 		users.last_name
-		// 	FROM posts
-		// 	INNER JOIN users
-		// 		ON posts.user_id = users.user_id';
 
 		$posts = DB::instance(DB_NAME)->select_rows($q);
 
@@ -211,7 +209,7 @@ class posts_controller extends base_controller {
             # trying to sneak in without being logged in, route to homepage
             Router::redirect('/');
         }
-	
+
 		# prepare data to be inserted in post_users table
 		$data = Array(
 			"created"	=> Time::now(),
@@ -236,9 +234,7 @@ class posts_controller extends base_controller {
 
 		DB::instance(DB_NAME)->update('posts', $data, 'WHERE post_id = '.$post_id);
 
-		// DB::instance(DB_NAME)->update
-
-
+		# update and return to the same page
 		Router::redirect('/posts');
 
 	}

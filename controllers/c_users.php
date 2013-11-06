@@ -207,7 +207,7 @@ class users_controller extends base_controller {
 
         $this->template->client_files_body = Utils::load_client_files($client_files_body);
 
-
+        #get info for listing posts from database
         $q = 'SELECT 
                 posts.content,
                 posts.created,
@@ -223,9 +223,6 @@ class users_controller extends base_controller {
         $posts = DB::instance(DB_NAME)->select_rows($q);
 
         $this->template->content->posts = $posts;
-
-        # for converting time to readable format, could be wrong
-        // $this->template->content->post_time = Time::display($posts['created']);
         
 
         # Display the View
