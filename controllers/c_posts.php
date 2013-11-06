@@ -33,6 +33,7 @@ class posts_controller extends base_controller {
 		$q = 'SELECT 
 				posts.content,
 				posts.created,
+				posts.post_id,
 				posts.user_id AS post_user_id,
 				users_users.user_id AS follower_id,
         		users.first_name,
@@ -54,7 +55,18 @@ class posts_controller extends base_controller {
 
 		$posts = DB::instance(DB_NAME)->select_rows($q);
 
+
+
+		$q = 'SELECT *
+				FROM posts_users
+				WHERE user_id = '.$this->user->user_id;
+		$likes = DB::instance(DB_NAME)->select_array($q, 'post_id');
+
+
+
 		$this->template->content->posts = $posts;
+		$this->template->content->likes = $likes;
+
 
 		echo $this->template;
 
@@ -75,12 +87,12 @@ class posts_controller extends base_controller {
 
 		$connections = DB::instance(DB_NAME)->select_array($q2, 'user_id_followed');
 
-		// print_r($connections);
+		print_r($connections);
 
 		$this->template->content->users = $users;
 		$this->template->content->connections = $connections;
 
-		echo $this->template;
+		// echo $this->template;
 
 	}
 
@@ -126,5 +138,20 @@ class posts_controller extends base_controller {
 
 	}
 
+	public function like($post_id) {
+	
+		# prepare data to be inserted in post_users table
+		$data = Array(
+			"created"	=> Time::now(),
+			"post_id"	=> $post_id,
+			"user_id"	=> $this->user->user_id
+			);
 
+		// print_r($data);
+
+		DB::instance(DB_NAME)->insert('posts_users', $data);
+
+		Router::redirect('/posts');
+
+	}
 }
