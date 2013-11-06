@@ -113,5 +113,18 @@ class posts_controller extends base_controller {
 
 	}
 
+	public function delete($post_id) {
+
+		# delete this post
+		$where_condition = 'WHERE posts.post_id = '.$post_id;
+
+
+		DB::instance(DB_NAME)->delete('posts', $where_condition);
+
+		# send them back to profile (i.e. refresh)
+		Router::redirect('/users/profile');
+
+	}
+
 
 }

@@ -172,6 +172,7 @@ class users_controller extends base_controller {
                 posts.content,
                 posts.created,
                 posts.user_id,
+                posts.post_id,
                 users.first_name,
                 users.last_name
             FROM posts
